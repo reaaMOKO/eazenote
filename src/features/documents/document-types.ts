@@ -35,3 +35,6 @@ export interface ClinicalDocument {
   /** `null` means DRAFT, NOT APPROVED. Nothing may be delivered while this is null. */
   approval: DocumentApproval | null;
 }
+
+/** How an approved document can be sent: to an email address or to a phone number. */
+export type DeliveryChannel = "email" | "phone";

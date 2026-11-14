@@ -12,17 +12,20 @@ import { ConsultStepper } from "./ConsultStepper";
 import { createConsult, findRecordingLockReason, type NewConsultForm } from "./consult-rules";
 import { saveConsult } from "./consult-store";
 
+const EMPTY_FORM: NewConsultForm = {
+  patientName: "",
+  patientEmail: "",
+  patientPhone: "",
+  isConsentConfirmed: false,
+};
+
 /**
  * Step 1: who the patient is, and confirmation that they agreed to be recorded.
  * The button to continue stays locked until consent is ticked (the consent lock).
  */
 export function NewConsultScreen() {
   const router = useRouter();
-  const [form, setForm] = useState<NewConsultForm>({
-    patientName: "",
-    patientEmail: "",
-    isConsentConfirmed: false,
-  });
+  const [form, setForm] = useState<NewConsultForm>(EMPTY_FORM);
   const [couldNotSave, setCouldNotSave] = useState(false);
 
   const recordingLockReason = findRecordingLockReason(form);
@@ -39,7 +42,13 @@ export function NewConsultScreen() {
     const consult = createConsult(form, crypto.randomUUID(), new Date().toISOString());
     const wasSaved = saveConsult(consult);
     setCouldNotSave(!wasSaved);
-    if (wasSaved) router.push(`/consults/${consult.id}/record`);
+    if (!wasSaved) return;
+
+    // Next.js keeps this screen alive in the background after leaving it.
+    // Clear the form now, so the next consult never opens showing this
+    // patient's details or an already-ticked consent box.
+    setForm(EMPTY_FORM);
+    router.push(`/consults/${consult.id}/record`);
   }
 
   return (
@@ -56,15 +65,27 @@ export function NewConsultScreen() {
           value={form.patientName}
           onChange={(patientName) => updateForm({ patientName })}
         />
-        <TextField
-          label="Patient's email address"
-          type="email"
-          inputMode="email"
-          isOptional
-          hint="Only needed if you will email a letter to the patient."
-          value={form.patientEmail}
-          onChange={(patientEmail) => updateForm({ patientEmail })}
-        />
+        <fieldset className="flex flex-col gap-4">
+          <legend className="mb-3 text-base text-slate">
+            Add contact details only if you plan to send a document to the patient.
+          </legend>
+          <TextField
+            label="Patient's email address"
+            type="email"
+            inputMode="email"
+            isOptional
+            value={form.patientEmail}
+            onChange={(patientEmail) => updateForm({ patientEmail })}
+          />
+          <TextField
+            label="Patient's phone number"
+            type="tel"
+            inputMode="tel"
+            isOptional
+            value={form.patientPhone}
+            onChange={(patientPhone) => updateForm({ patientPhone })}
+          />
+        </fieldset>
 
         <Checkbox
           label="The patient has consented to this consultation being recorded"

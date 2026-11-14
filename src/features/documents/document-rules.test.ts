@@ -2,6 +2,7 @@ import { describe, expect, it } from "vitest";
 import {
   approveDocument,
   canDeliver,
+  canSendElectronically,
   countCheckMarkers,
   countCheckMarkersInDocument,
   findApprovalBlocker,
@@ -68,6 +69,25 @@ describe("delivery", () => {
   it("is allowed once approved", () => {
     const approved = approveDocument(buildDraft("Amoxicillin for 5 days."), APPROVER, APPROVED_AT);
     expect(canDeliver(approved)).toBe(true);
+  });
+});
+
+describe("sending by email or phone", () => {
+  const approvedNote = approveDocument(buildDraft("Amoxicillin for 5 days."), APPROVER, APPROVED_AT);
+
+  it("is not allowed for a draft", () => {
+    expect(canSendElectronically(buildDraft("Amoxicillin for 5 days."))).toBe(false);
+  });
+
+  it("is allowed for an approved note or referral letter", () => {
+    expect(canSendElectronically(approvedNote)).toBe(true);
+    expect(canSendElectronically({ ...approvedNote, kind: "referral-letter" })).toBe(true);
+  });
+
+  it("is never allowed for a prescription, even when approved", () => {
+    const approvedPrescription: ClinicalDocument = { ...approvedNote, kind: "prescription-draft" };
+    expect(canDeliver(approvedPrescription)).toBe(true); // It can still be printed.
+    expect(canSendElectronically(approvedPrescription)).toBe(false);
   });
 });
 

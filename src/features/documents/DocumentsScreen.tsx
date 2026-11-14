@@ -66,8 +66,8 @@ function DocumentsReview({ consult }: { consult: Consult }) {
     <>
       <div className="print:hidden">
         <PageHeading title={`Documents for ${consult.patientName}`}>
-          Read each draft, correct it, and approve it. Nothing can be copied, printed or sent
-          until you approve it.
+          Read each draft, correct it, and approve it. Then print it or send it. Nothing can be
+          printed or sent until you approve it.
         </PageHeading>
       </div>
 
@@ -142,6 +142,7 @@ function DocumentWorkspace({ consult, document, onDocumentChange }: DocumentWork
             document={document}
             patientName={consult.patientName}
             patientEmail={consult.patientEmail}
+            patientPhone={consult.patientPhone ?? ""}
           />
         </div>
 

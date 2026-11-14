@@ -5,7 +5,7 @@
  * To connect a real service later, change the right-hand side of one line.
  */
 import { sampleDraftingService, type DraftingService } from "./drafting/drafting-service";
-import { sampleEmailService, type EmailService } from "./email/email-service";
+import { sampleDeliveryService, type DeliveryService } from "./delivery/delivery-service";
 import {
   sampleTranscriptionService,
   type TranscriptionService,
@@ -13,4 +13,4 @@ import {
 
 export const transcriptionService: TranscriptionService = sampleTranscriptionService;
 export const draftingService: DraftingService = sampleDraftingService;
-export const emailService: EmailService = sampleEmailService;
+export const deliveryService: DeliveryService = sampleDeliveryService;

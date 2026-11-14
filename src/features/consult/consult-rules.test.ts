@@ -12,6 +12,7 @@ const NOW = "2026-11-14T19:00:00.000Z";
 const COMPLETE_FORM: NewConsultForm = {
   patientName: "Thandi Mokoena",
   patientEmail: "",
+  patientPhone: "",
   isConsentConfirmed: true,
 };
 
@@ -28,6 +29,12 @@ describe("consent lock", () => {
   it("rejects a malformed email but accepts an empty one", () => {
     expect(findRecordingLockReason({ ...COMPLETE_FORM, patientEmail: "thandi@" })).toContain("email");
     expect(findRecordingLockReason(COMPLETE_FORM)).toBeNull();
+  });
+
+  it("rejects a malformed phone number but accepts local and international ones", () => {
+    expect(findRecordingLockReason({ ...COMPLETE_FORM, patientPhone: "12345" })).toContain("phone");
+    expect(findRecordingLockReason({ ...COMPLETE_FORM, patientPhone: "082 123 4567" })).toBeNull();
+    expect(findRecordingLockReason({ ...COMPLETE_FORM, patientPhone: "+27 82 123 4567" })).toBeNull();
   });
 
   it("refuses to create a consult without consent", () => {

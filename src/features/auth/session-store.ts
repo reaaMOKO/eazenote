@@ -2,8 +2,8 @@
  * Who is signed in.
  *
  * PHASE 1: a stand-in. It only remembers the email typed on the sign-in screen;
- * it proves nothing about identity. Phase 2 replaces it with Supabase
- * magic-link sign-in, where the server checks every request.
+ * it proves nothing about identity. Phase 2 replaces it with Supabase Auth
+ * (password or emailed code), where the server checks every request.
  */
 import { createBrowserStore, useBrowserStoreValue } from "@/lib/browser-store";
 

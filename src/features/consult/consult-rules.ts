@@ -2,12 +2,13 @@
  * Rules for starting and continuing a consult.
  * Pure functions with no screen code; tested in consult-rules.test.ts.
  */
-import { looksLikeEmailAddress } from "@/lib/format";
+import { looksLikeEmailAddress, looksLikePhoneNumber } from "@/lib/format";
 import type { Consult, ConsultStep } from "./consult-types";
 
 export interface NewConsultForm {
   patientName: string;
   patientEmail: string;
+  patientPhone: string;
   isConsentConfirmed: boolean;
 }
 
@@ -22,6 +23,9 @@ export function findRecordingLockReason(form: NewConsultForm): string | null {
   }
   if (form.patientEmail.trim() !== "" && !looksLikeEmailAddress(form.patientEmail)) {
     return "Check the patient's email address, or leave it empty.";
+  }
+  if (form.patientPhone.trim() !== "" && !looksLikePhoneNumber(form.patientPhone)) {
+    return "Check the patient's phone number, or leave it empty.";
   }
   if (!form.isConsentConfirmed) {
     return "Recording is locked until you confirm the patient has consented.";
@@ -41,6 +45,7 @@ export function createConsult(form: NewConsultForm, consultId: string, nowIso: s
     createdAt: nowIso,
     patientName: form.patientName.trim(),
     patientEmail: form.patientEmail.trim(),
+    patientPhone: form.patientPhone.trim(),
     consentConfirmedAt: nowIso,
     recordingSeconds: null,
     transcript: null,

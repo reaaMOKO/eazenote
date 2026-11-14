@@ -18,8 +18,10 @@ export interface Consult {
   id: string;
   createdAt: string;
   patientName: string;
-  /** Only needed when a letter will be emailed to the patient. */
+  /** Optional. Pre-fills the "Send" window when a document goes to the patient by email. */
   patientEmail: string;
+  /** Optional. Pre-fills the "Send" window when a document goes to the patient's phone. */
+  patientPhone: string;
   /** When the doctor confirmed the patient agreed to be recorded. Always set: a consult cannot exist without it. */
   consentConfirmedAt: string;
   recordingSeconds: number | null;

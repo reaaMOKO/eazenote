@@ -62,6 +62,7 @@ Rules the code enforces:
 | Nothing can be copied, printed or emailed before approval | same file |
 | Editing an approved document removes the approval | same file |
 | Every approval records who approved and when | same file |
+| Prescription drafts are printed and signed by hand, never sent by email or phone | same file |
 
 Each rule has tests next to it (`*.test.ts`).
 
@@ -78,7 +79,7 @@ src/
   services/       The outside services, each behind one small file:
     transcription/  speech-to-text   (sample data now; Vulavula or ElevenLabs in Phase 3)
     drafting/       AI drafting      (sample data now; Claude in Phase 3)
-    email/          email sending    (sends nothing now; Resend in Phase 4)
+    delivery/       email and phone  (sends nothing now; real sending in Phase 4)
     index.ts        chooses which implementation the app uses
   components/     Shared building blocks: buttons, text boxes, notices, logo, header
   config/         Settings that are safe to be public (demo mode, limits)

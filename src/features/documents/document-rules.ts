@@ -8,6 +8,10 @@
  *   4. Changing an approved document removes its approval.
  *   5. Every approval records who approved and when.
  *
+ *   6. Prescription drafts are printed and signed by hand. They are never
+ *      sent by email or phone, because an unsigned prescription is not valid
+ *      and electronic prescriptions still need a legal check.
+ *
  * Pure functions with no screen code, so each rule has a test in
  * document-rules.test.ts.
  */
@@ -34,6 +38,11 @@ export function isApproved(document: ClinicalDocument): boolean {
 /** Rule 3: delivery (copy, print, email) is only allowed after approval. */
 export function canDeliver(document: ClinicalDocument): boolean {
   return isApproved(document);
+}
+
+/** Rule 3 and 6: only approved documents can be sent, and never a prescription draft. */
+export function canSendElectronically(document: ClinicalDocument): boolean {
+  return canDeliver(document) && document.kind !== "prescription-draft";
 }
 
 /**

@@ -1,7 +1,7 @@
 "use client";
 
 import { useRouter } from "next/navigation";
-import { useState } from "react";
+import { useLayoutEffect, useState } from "react";
 import { PageHeading } from "@/components/layout/PageHeading";
 import { Button, ButtonLink } from "@/components/ui/Button";
 import { Notice } from "@/components/ui/Notice";
@@ -29,6 +29,16 @@ function RecordingPanel({ consult }: { consult: Consult }) {
   const recorder = useAudioRecorder();
   const [isTranscribing, setIsTranscribing] = useState(false);
   const [transcriptionFailed, setTranscriptionFailed] = useState(false);
+
+  // Next.js keeps this screen alive in the background after leaving it.
+  // Reset the progress flags on the way out, so coming back with the Back
+  // button never shows a stuck "Transcribing" message.
+  useLayoutEffect(() => {
+    return () => {
+      setIsTranscribing(false);
+      setTranscriptionFailed(false);
+    };
+  }, []);
 
   const isRecording = recorder.status === "recording";
   const isStartingMicrophone = recorder.status === "requesting-microphone";

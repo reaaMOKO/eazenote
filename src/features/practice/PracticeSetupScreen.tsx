@@ -3,30 +3,106 @@
 import { useRouter } from "next/navigation";
 import { useState, type FormEvent } from "react";
 import { PageHeading } from "@/components/layout/PageHeading";
-import { Button } from "@/components/ui/Button";
+import { Button, ButtonLink } from "@/components/ui/Button";
+import { PencilIcon } from "@/components/ui/icons";
 import { Notice } from "@/components/ui/Notice";
 import { TextField } from "@/components/ui/TextField";
 import { LetterheadHeader } from "@/features/documents/LetterheadDocument";
 import { ImageUploadField } from "./ImageUploadField";
-import { findPracticeFieldErrors, type PracticeFieldErrors } from "./practice-rules";
+import {
+  findPracticeFieldErrors,
+  isPracticeProfileComplete,
+  type PracticeFieldErrors,
+} from "./practice-rules";
 import { savePracticeProfile, usePracticeProfile } from "./practice-store";
 import { EMPTY_PRACTICE_PROFILE, type PracticeProfile } from "./practice-types";
 
-/** One-time setup: the details that appear on every document's letterhead. */
+/**
+ * Practice details are entered ONCE, not per patient.
+ *
+ *   First visit:  the setup form.
+ *   After that:   a read-only summary with an "Edit" button. Every document
+ *                 picks the saved details up automatically.
+ */
 export function PracticeSetupScreen() {
   const savedProfile = usePracticeProfile();
+  const [isEditing, setIsEditing] = useState(false);
 
   // Wait until the saved details are read, so the form starts with them filled in.
   if (savedProfile === undefined) return null;
 
-  return <PracticeSetupForm startingProfile={savedProfile ?? EMPTY_PRACTICE_PROFILE} />;
+  const isAlreadySetUp = isPracticeProfileComplete(savedProfile);
+
+  if (savedProfile && isAlreadySetUp && !isEditing) {
+    return <SavedPracticeSummary profile={savedProfile} onEdit={() => setIsEditing(true)} />;
+  }
+
+  return (
+    <PracticeSetupForm
+      startingProfile={savedProfile ?? EMPTY_PRACTICE_PROFILE}
+      isFirstSetup={!isAlreadySetUp}
+      onFinishedEditing={() => setIsEditing(false)}
+    />
+  );
+}
+
+/** What the doctor sees once setup is done: the saved letterhead, nothing to fill in. */
+function SavedPracticeSummary({ profile, onEdit }: { profile: PracticeProfile; onEdit: () => void }) {
+  return (
+    <>
+      <PageHeading title="Practice details">
+        Saved. These go on every document automatically, so there is nothing to fill in for each
+        patient.
+      </PageHeading>
+
+      <div className="rounded-lg border border-line bg-white p-5 sm:p-8">
+        <LetterheadHeader practiceProfile={profile} />
+        <dl className="mt-4 grid gap-x-8 gap-y-3 text-base sm:grid-cols-2">
+          <div>
+            <dt className="text-sm text-slate">Doctor</dt>
+            <dd className="font-semibold text-ink">{profile.doctorName}</dd>
+          </div>
+          <div>
+            <dt className="text-sm text-slate">HPCSA number</dt>
+            <dd className="font-semibold text-ink">{profile.hpcsaNumber}</dd>
+          </div>
+          <div>
+            <dt className="text-sm text-slate">Logo</dt>
+            <dd className="font-semibold text-ink">{profile.logoImage ? "Added" : "Not added"}</dd>
+          </div>
+          <div>
+            <dt className="text-sm text-slate">Signature for referral letters</dt>
+            <dd className="font-semibold text-ink">
+              {profile.signatureImage ? "Added" : "Not added"}
+            </dd>
+          </div>
+        </dl>
+      </div>
+
+      <div className="flex flex-wrap gap-3">
+        <ButtonLink href="/consults/new">Start a consult</ButtonLink>
+        <Button variant="secondary" onClick={onEdit}>
+          <PencilIcon />
+          Edit practice details
+        </Button>
+      </div>
+    </>
+  );
 }
 
 function countErrors(fieldErrors: PracticeFieldErrors): number {
   return Object.values(fieldErrors).filter(Boolean).length;
 }
 
-function PracticeSetupForm({ startingProfile }: { startingProfile: PracticeProfile }) {
+interface PracticeSetupFormProps {
+  startingProfile: PracticeProfile;
+  /** True the first time, before any details are saved. */
+  isFirstSetup: boolean;
+  /** Called after saving or cancelling an edit, to return to the summary. */
+  onFinishedEditing: () => void;
+}
+
+function PracticeSetupForm({ startingProfile, isFirstSetup, onFinishedEditing }: PracticeSetupFormProps) {
   const router = useRouter();
   const [profile, setProfile] = useState(startingProfile);
   const [fieldErrors, setFieldErrors] = useState<PracticeFieldErrors>({});
@@ -50,16 +126,21 @@ function PracticeSetupForm({ startingProfile }: { startingProfile: PracticeProfi
 
     const wasSaved = savePracticeProfile(profile);
     setCouldNotSave(!wasSaved);
-    if (wasSaved) router.push("/consults");
+    if (!wasSaved) return;
+
+    // First setup leads straight into the first consult; a later edit returns to the summary.
+    if (isFirstSetup) router.push("/consults");
+    else onFinishedEditing();
   }
 
   const errorCount = countErrors(fieldErrors);
 
   return (
     <>
-      <PageHeading title="Practice details">
-        These appear on the letterhead of every referral letter and prescription. You set them up
-        once and can change them any time.
+      <PageHeading title={isFirstSetup ? "Set up your practice" : "Edit practice details"}>
+        {isFirstSetup
+          ? "You do this once. EazeNote puts these details on the letterhead of every document, so you never retype them for a patient."
+          : "Changes apply to every document you approve from now on."}
       </PageHeading>
 
       <form onSubmit={handleSave} noValidate className="flex flex-col gap-8">
@@ -152,9 +233,14 @@ function PracticeSetupForm({ startingProfile }: { startingProfile: PracticeProfi
           </Notice>
         )}
 
-        <Button type="submit" className="sm:self-start">
-          Save practice details
-        </Button>
+        <div className="flex flex-wrap gap-3">
+          <Button type="submit">Save practice details</Button>
+          {!isFirstSetup && (
+            <Button variant="secondary" onClick={onFinishedEditing}>
+              Cancel
+            </Button>
+          )}
+        </div>
       </form>
     </>
   );

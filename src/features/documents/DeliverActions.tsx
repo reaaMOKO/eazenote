@@ -3,31 +3,36 @@
 import { useRef, useState } from "react";
 import { Button } from "@/components/ui/Button";
 import { CopyIcon, MailIcon, PrinterIcon } from "@/components/ui/icons";
-import { canDeliver, formatDocumentAsPlainText } from "./document-rules";
+import { canDeliver, canSendElectronically, formatDocumentAsPlainText } from "./document-rules";
 import type { ClinicalDocument } from "./document-types";
-import { EmailReferralDialog } from "./EmailReferralDialog";
+import { SendDocumentDialog } from "./SendDocumentDialog";
 
 interface DeliverActionsProps {
   document: ClinicalDocument;
   patientName: string;
   patientEmail: string;
+  patientPhone: string;
 }
 
 /**
- * The ways an APPROVED document leaves EazeNote. Each kind has its own route:
- *   clinical note:      copy into the practice system, or print / save as PDF
- *   referral letter:    email, or print / save as PDF
- *   prescription draft: print, then sign by hand
+ * The ways an APPROVED document leaves EazeNote:
+ *
+ *   clinical note:      send (email or phone), print / save as PDF, or copy
+ *   referral letter:    send (email or phone), or print / save as PDF
+ *   prescription draft: print only, then sign by hand
  *
  * Nothing here runs automatically; the doctor presses each button.
  */
-export function DeliverActions({ document, patientName, patientEmail }: DeliverActionsProps) {
-  const emailDialogRef = useRef<HTMLDialogElement>(null);
+export function DeliverActions({ document, patientName, patientEmail, patientPhone }: DeliverActionsProps) {
+  const sendDialogRef = useRef<HTMLDialogElement>(null);
   const [copyStatus, setCopyStatus] = useState<"idle" | "copied" | "failed">("idle");
 
   // Safety rule: drafts are never delivered. The screen only shows these
   // buttons after approval, and this check stops any other route to them.
   if (!canDeliver(document)) return null;
+
+  const isSendingAllowed = canSendElectronically(document);
+  const isPrescription = document.kind === "prescription-draft";
 
   async function handleCopy() {
     try {
@@ -46,36 +51,22 @@ export function DeliverActions({ document, patientName, patientEmail }: DeliverA
   return (
     <div className="flex flex-col gap-2">
       <div className="flex flex-wrap gap-3">
+        {isSendingAllowed && (
+          <Button onClick={() => sendDialogRef.current?.showModal()}>
+            <MailIcon />
+            {document.kind === "referral-letter" ? "Send referral letter" : "Send to patient"}
+          </Button>
+        )}
+
+        <Button variant={isSendingAllowed ? "secondary" : "primary"} onClick={handlePrint}>
+          <PrinterIcon />
+          {isPrescription ? "Print prescription" : "Print or save as PDF"}
+        </Button>
+
         {document.kind === "clinical-note" && (
-          <>
-            <Button onClick={handleCopy}>
-              <CopyIcon />
-              Copy note
-            </Button>
-            <Button variant="secondary" onClick={handlePrint}>
-              <PrinterIcon />
-              Print or save as PDF
-            </Button>
-          </>
-        )}
-
-        {document.kind === "referral-letter" && (
-          <>
-            <Button onClick={() => emailDialogRef.current?.showModal()}>
-              <MailIcon />
-              Email referral letter
-            </Button>
-            <Button variant="secondary" onClick={handlePrint}>
-              <PrinterIcon />
-              Print or save as PDF
-            </Button>
-          </>
-        )}
-
-        {document.kind === "prescription-draft" && (
-          <Button onClick={handlePrint}>
-            <PrinterIcon />
-            Print prescription
+          <Button variant="secondary" onClick={handleCopy}>
+            <CopyIcon />
+            Copy note
           </Button>
         )}
       </div>
@@ -85,16 +76,17 @@ export function DeliverActions({ document, patientName, patientEmail }: DeliverA
         {copyStatus === "failed" &&
           "Copying is blocked in this browser. Use Print or save as PDF instead."}
         {copyStatus === "idle" &&
-          document.kind === "prescription-draft" &&
-          "Sign the printed prescription by hand. It is not valid until signed."}
+          isPrescription &&
+          "Sign the printed prescription by hand; it is not valid until signed. Prescriptions cannot be sent by email or phone."}
       </p>
 
-      {document.kind === "referral-letter" && (
-        <EmailReferralDialog
-          dialogRef={emailDialogRef}
-          referralLetter={document}
+      {isSendingAllowed && (
+        <SendDocumentDialog
+          dialogRef={sendDialogRef}
+          document={document}
           patientName={patientName}
-          suggestedRecipientEmail={patientEmail}
+          patientEmail={patientEmail}
+          patientPhone={patientPhone}
         />
       )}
     </div>

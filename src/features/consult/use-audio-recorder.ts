@@ -1,6 +1,6 @@
 "use client";
 
-import { useCallback, useEffect, useRef, useState } from "react";
+import { useCallback, useLayoutEffect, useRef, useState } from "react";
 
 export type RecorderStatus = "idle" | "requesting-microphone" | "recording" | "failed";
 
@@ -46,12 +46,23 @@ export function useAudioRecorder() {
     }
     microphoneStreamRef.current?.getTracks().forEach((track) => track.stop());
     microphoneStreamRef.current = null;
+    mediaRecorderRef.current = null;
     void audioContextRef.current?.close().catch(() => undefined);
     audioContextRef.current = null;
   }, []);
 
-  // Leaving the screen mid-recording must not leave the microphone on.
-  useEffect(() => releaseMicrophone, [releaseMicrophone]);
+  // Leaving the screen mid-recording must not leave the microphone on, and
+  // the abandoned audio is thrown away. (Next.js keeps the screen alive in the
+  // background, so the on-screen state is reset here too.)
+  useLayoutEffect(() => {
+    return () => {
+      releaseMicrophone();
+      audioChunksRef.current = [];
+      setStatus("idle");
+      setElapsedSeconds(0);
+      setInputLevel(0);
+    };
+  }, [releaseMicrophone]);
 
   async function startRecording(): Promise<void> {
     if (!navigator.mediaDevices?.getUserMedia || typeof MediaRecorder === "undefined") {
@@ -124,7 +135,6 @@ export function useAudioRecorder() {
       mediaRecorder.onstop = () => {
         const recordedAudio = new Blob(audioChunksRef.current, { type: mediaRecorder.mimeType });
         audioChunksRef.current = []; // Keep no copy here.
-        mediaRecorderRef.current = null;
         releaseMicrophone();
         setInputLevel(0);
         setStatus("idle");

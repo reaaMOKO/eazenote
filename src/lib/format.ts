@@ -45,3 +45,12 @@ export function formatDurationInWords(totalSeconds: number): string {
 export function looksLikeEmailAddress(text: string): boolean {
   return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(text.trim());
 }
+
+/**
+ * Accepts South African and international numbers, written with or without
+ * spaces, dashes or brackets: "082 123 4567", "+27 82 123 4567".
+ */
+export function looksLikePhoneNumber(text: string): boolean {
+  const digitsAndPlus = text.replace(/[\s\-()]/g, "");
+  return /^\+?\d{10,15}$/.test(digitsAndPlus);
+}

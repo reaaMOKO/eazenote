@@ -29,7 +29,11 @@ export function SignedInShell({ children }: { children: ReactNode }) {
     <>
       <AppHeader />
       <DemoModeBar />
-      <main className="mx-auto flex w-full max-w-3xl flex-1 flex-col gap-8 px-4 py-6 sm:px-6 sm:py-10 print:max-w-none print:p-0">
+      {/* The key discards any on-screen state if a different doctor signs in. */}
+      <main
+        key={session.email}
+        className="mx-auto flex w-full max-w-3xl flex-1 flex-col gap-8 px-4 py-6 sm:px-6 sm:py-10 print:max-w-none print:p-0"
+      >
         {children}
       </main>
     </>
