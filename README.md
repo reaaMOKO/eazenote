@@ -14,6 +14,8 @@ EazeNote is the EazeHealth tool a doctor uses during a consultation. The doctor 
 | 5. Safety and hardening | Auto-delete, rate limits, more tests, accessibility pass | |
 | 6. Deploy and dry run | Live at app.eazehealth.co.za | |
 
+The Phase 1 demo is hosted on Vercel, which rebuilds and republishes the site every time `main` changes on GitHub.
+
 **The app is in demo mode.** Every consult shows the same fictional sample transcript and drafts. Nothing is uploaded or emailed, and no API keys are needed. Do not enter real patient details.
 
 ## Run it on your computer
@@ -36,6 +38,15 @@ Other commands:
 | `npm run test` | Tests for the safety rules. |
 
 The same checks run on GitHub for every push (`.github/workflows/checks.yml`).
+
+## Putting it online (Vercel)
+
+1. Sign in at vercel.com with the GitHub account that owns this repository.
+2. Add New → Project → Import this repository. Keep every default setting and press Deploy.
+3. The site is live at the `vercel.app` address Vercel shows. From then on, every change merged into `main` goes live automatically, and every pull request gets its own preview link.
+4. For `app.eazehealth.co.za`: in the Vercel project open Settings → Domains, add the address, and create the CNAME record Vercel shows at the company that manages the eazehealth.co.za domain.
+
+No environment variables are needed while the app is in demo mode.
 
 ## API keys and secrets
 

@@ -6,6 +6,8 @@ import type { NextConfig } from "next";
  * services (Supabase, email) are known.
  */
 const SECURITY_HEADERS = [
+  // Always use the encrypted (https) address, for the next two years.
+  { key: "Strict-Transport-Security", value: "max-age=63072000; includeSubDomains" },
   // Stop other websites from showing EazeNote inside a frame (clickjacking).
   { key: "X-Frame-Options", value: "DENY" },
   // Stop browsers from guessing file types.

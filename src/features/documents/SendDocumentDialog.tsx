@@ -171,7 +171,7 @@ export function SendDocumentDialog({
         {sendState === "not-sent-demo-mode" && (
           <Notice tone="info" title="Demo mode: nothing was sent" announce="status">
             In the live app, the {documentName} would now be on its way to{" "}
-            <strong>{recipient}</strong>. Sending is switched on in Phase 4.
+            <strong>{recipient}</strong>. Sending is not switched on yet.
           </Notice>
         )}
         {sendState === "sent" && (
