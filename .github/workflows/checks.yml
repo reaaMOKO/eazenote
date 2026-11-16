@@ -1,0 +1,39 @@
+# Runs on GitHub for every push and pull request.
+# A red cross next to a commit means one of these checks failed.
+name: Checks
+
+on:
+  push:
+  pull_request:
+
+permissions:
+  contents: read
+
+jobs:
+  checks:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+
+      - name: Install packages
+        run: npm ci
+
+      - name: Secret scan (no API keys in the code)
+        run: npm run check:secrets
+
+      - name: Code style
+        run: npm run lint
+
+      - name: Type check
+        run: npm run typecheck
+
+      - name: Safety-rule tests
+        run: npm run test
+
+      - name: Production build
+        run: npm run build

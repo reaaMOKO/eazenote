@@ -1,0 +1,75 @@
+@import "tailwindcss";
+
+/*
+ * EazeHealth brand tokens (from the brand canvas and eazehealth.co.za).
+ * Use these names in class names, e.g. "bg-deep", "text-slate", "border-line".
+ * Every text/background pair used in the app meets WCAG AA contrast (4.5:1).
+ */
+@theme {
+  --font-sans: "Inter Variable", Inter, -apple-system, "Segoe UI", Roboto, sans-serif;
+
+  /* Brand */
+  --color-deep: #1e5f4a; /* badge, primary buttons, headings */
+  --color-green: #237a5b; /* hover, second word of the wordmark */
+  --color-slate: #57655f; /* secondary text, input borders */
+  --color-mint: #bde6d0; /* soft accents on deep green */
+  --color-tint: #f0f9f4; /* quiet surface behind grouped content */
+
+  /* Soft green-tinted shadow under the white cards of the signed-in screens. */
+  --shadow-card: 0 10px 30px rgb(30 95 74 / 0.08), 0 1px 2px rgb(30 95 74 / 0.06);
+
+  /* Neutrals */
+  --color-ink: #16332a; /* body text */
+  --color-line: #d5deda; /* dividers */
+
+  /* Status: each differs from the others in lightness, not hue alone */
+  --color-danger: #a3261e; /* recording, errors */
+  --color-danger-tint: #fdecea;
+  --color-caution: #6b4a00; /* drafts and [CHECK] items */
+  --color-caution-tint: #fff3d1;
+  --color-caution-line: #c99a1a;
+}
+
+body {
+  background: #ffffff;
+  color: var(--color-ink);
+  font-family: var(--font-sans);
+}
+
+/*
+ * One visible keyboard focus style for every interactive element.
+ * It sits in the "base" layer so an individual component can replace it
+ * (the password box draws the outline around the box and its Show button).
+ */
+@layer base {
+  :focus-visible {
+    outline: 3px solid var(--color-deep);
+    outline-offset: 2px;
+  }
+}
+
+/* Text boxes grow with their content where the browser supports it. */
+textarea {
+  field-sizing: content;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    transition-duration: 0.01ms !important;
+  }
+}
+
+/* Printing: only the letterhead document goes on paper. */
+@media print {
+  body {
+    background: #ffffff;
+  }
+
+  @page {
+    size: A4;
+    margin: 18mm;
+  }
+}
