@@ -1,10 +1,12 @@
 "use client";
 
-import { useRouter } from "next/navigation";
-import { useEffect, type ReactNode } from "react";
+import { usePathname, useRouter } from "next/navigation";
+import { Suspense, useEffect, type ReactNode } from "react";
 import { useDemoSession } from "@/features/auth/session-store";
 import { AppHeader } from "./AppHeader";
 import { DemoModeBar } from "./DemoModeBar";
+
+const HOME_PATH = "/consults";
 
 /**
  * Frame for signed-in screens: sends signed-out visitors to the sign-in
@@ -26,13 +28,28 @@ export function SignedInShell({ children }: { children: ReactNode }) {
   if (!session) return null;
 
   return (
-    <>
-      <AppHeader />
-      <DemoModeBar />
+    // Next.js requires a Suspense boundary around anything that reads the page address.
+    <Suspense fallback={null}>
       {/* The key discards any on-screen state if a different doctor signs in. */}
+      <PageFrame key={session.email}>{children}</PageFrame>
+    </Suspense>
+  );
+}
+
+/** The top bar plus the page column, sized for the current screen. */
+function PageFrame({ children }: { children: ReactNode }) {
+  const currentPath = usePathname();
+
+  // The home screen has side-by-side content, so it gets a wider page.
+  // Forms and documents read better in a narrower column.
+  const pageWidthClass = currentPath === HOME_PATH ? "max-w-5xl" : "max-w-3xl";
+
+  return (
+    <>
+      <AppHeader pageWidthClass={pageWidthClass} />
+      <DemoModeBar pageWidthClass={pageWidthClass} />
       <main
-        key={session.email}
-        className="mx-auto flex w-full max-w-3xl flex-1 flex-col gap-8 px-4 py-6 sm:px-6 sm:py-10 print:max-w-none print:p-0"
+        className={`mx-auto flex w-full ${pageWidthClass} flex-1 flex-col gap-8 px-4 py-6 sm:px-6 sm:py-10 print:max-w-none print:p-0`}
       >
         {children}
       </main>

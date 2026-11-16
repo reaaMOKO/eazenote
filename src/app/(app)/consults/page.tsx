@@ -1,8 +1,8 @@
 import type { Metadata } from "next";
-import { ConsultListScreen } from "@/features/consult/ConsultListScreen";
+import { HomeScreen } from "@/features/home/HomeScreen";
 
-export const metadata: Metadata = { title: "Consults" };
+export const metadata: Metadata = { title: "Home" };
 
 export default function Page() {
-  return <ConsultListScreen />;
+  return <HomeScreen />;
 }

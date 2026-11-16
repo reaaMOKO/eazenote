@@ -11,7 +11,7 @@ const NAVIGATION_LINKS = [
 ];
 
 /** Top bar on every signed-in screen. Hidden when printing a document. */
-export function AppHeader() {
+export function AppHeader({ pageWidthClass }: { pageWidthClass: string }) {
   const currentPath = usePathname();
   const router = useRouter();
 
@@ -22,7 +22,7 @@ export function AppHeader() {
 
   return (
     <header className="border-b border-line bg-white print:hidden">
-      <div className="mx-auto flex w-full max-w-3xl flex-wrap items-center justify-between gap-x-4 gap-y-1 px-4 py-2 sm:px-6">
+      <div className={`mx-auto flex w-full ${pageWidthClass} flex-wrap items-center justify-between gap-x-4 gap-y-1 px-4 py-2 sm:px-6`}>
         <Link href="/consults" aria-label="EazeNote: go to consults" className="rounded-lg py-1.5">
           <EazeNoteLogo badgeSize={32} />
         </Link>

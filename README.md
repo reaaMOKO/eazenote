@@ -73,6 +73,7 @@ src/
   app/            Page addresses (routes). Each page file is a few lines that show one screen.
   features/       One folder per part of the product:
     auth/           sign-in
+    home/           the home screen after sign-in
     practice/       practice details and letterhead
     consult/        new consult, recording, transcript
     documents/      drafting, editing, approval, delivery

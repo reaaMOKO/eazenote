@@ -114,3 +114,33 @@ export function PencilIcon(props: IconProps) {
     </LineIcon>
   );
 }
+
+/** Lines on a page: the clinical note. */
+export function NoteIcon(props: IconProps) {
+  return (
+    <LineIcon {...props}>
+      <path d="M6 3h9l4 4v14H6z" />
+      <path d="M9 11h7M9 15h7M9 7h3" />
+    </LineIcon>
+  );
+}
+
+/** An arrow curving onward: the referral letter. */
+export function ReferralIcon(props: IconProps) {
+  return (
+    <LineIcon {...props}>
+      <path d="M4 19c0-6 4-10 11-10h4" />
+      <path d="M15 5l4 4-4 4" />
+    </LineIcon>
+  );
+}
+
+/** A capsule: the prescription. */
+export function PillIcon(props: IconProps) {
+  return (
+    <LineIcon {...props}>
+      <rect x="2.5" y="8" width="19" height="8" rx="4" transform="rotate(-45 12 12)" />
+      <path d="M9.2 9.2l5.6 5.6" />
+    </LineIcon>
+  );
+}
