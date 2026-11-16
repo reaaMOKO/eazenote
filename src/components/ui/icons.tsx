@@ -115,32 +115,36 @@ export function PencilIcon(props: IconProps) {
   );
 }
 
-/** Lines on a page: the clinical note. */
-export function NoteIcon(props: IconProps) {
+export function HomeIcon(props: IconProps) {
   return (
     <LineIcon {...props}>
-      <path d="M6 3h9l4 4v14H6z" />
-      <path d="M9 11h7M9 15h7M9 7h3" />
+      <path d="M4 11l8-7 8 7v8a1 1 0 0 1-1 1h-4v-6h-6v6H5a1 1 0 0 1-1-1z" />
     </LineIcon>
   );
 }
 
-/** An arrow curving onward: the referral letter. */
-export function ReferralIcon(props: IconProps) {
+/** A small building: the practice. */
+export function PracticeIcon(props: IconProps) {
   return (
     <LineIcon {...props}>
-      <path d="M4 19c0-6 4-10 11-10h4" />
-      <path d="M15 5l4 4-4 4" />
+      <path d="M5 21V5a1 1 0 0 1 1-1h12a1 1 0 0 1 1 1v16M3 21h18" />
+      <path d="M12 8v5M9.5 10.5h5M10 21v-4h4v4" />
     </LineIcon>
   );
 }
 
-/** A capsule: the prescription. */
-export function PillIcon(props: IconProps) {
+export function SignOutIcon(props: IconProps) {
   return (
     <LineIcon {...props}>
-      <rect x="2.5" y="8" width="19" height="8" rx="4" transform="rotate(-45 12 12)" />
-      <path d="M9.2 9.2l5.6 5.6" />
+      <path d="M10 4H6a1 1 0 0 0-1 1v14a1 1 0 0 0 1 1h4M15 8l4 4-4 4M19 12H9" />
+    </LineIcon>
+  );
+}
+
+export function ChevronRightIcon(props: IconProps) {
+  return (
+    <LineIcon {...props}>
+      <path d="M9 6l6 6-6 6" />
     </LineIcon>
   );
 }

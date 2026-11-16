@@ -15,32 +15,8 @@
   --color-mint: #bde6d0; /* soft accents on deep green */
   --color-tint: #f0f9f4; /* quiet surface behind grouped content */
 
-  /*
-   * Warm accents taken from the EazeNote ad. HOME SCREEN ONLY, so the working
-   * screens (consult, documents) stay calm and clinical.
-   */
-  --color-cream: #f7f3ea; /* hero background */
-  --color-ring: #ece5d3; /* the soft circle behind the hero */
-  --color-forest: #0f3b2e; /* headline text; text on amber */
-  --color-ember: #c2501f; /* orange block; passes AA with white text */
-  --color-amber: #f0a52b; /* yellow block; use forest text on it */
-  --color-sun: #ffd27a; /* highlighted words on the orange block (large text only) */
-
-  /* The headline settles into focus once when the home screen opens, as in the ad. */
-  --animate-reveal: reveal 700ms cubic-bezier(0.2, 0.7, 0.2, 1) both;
-
-  @keyframes reveal {
-    from {
-      opacity: 0;
-      filter: blur(8px);
-      transform: translateY(8px);
-    }
-    to {
-      opacity: 1;
-      filter: blur(0);
-      transform: none;
-    }
-  }
+  /* Soft green-tinted shadow under the white cards of the signed-in screens. */
+  --shadow-card: 0 10px 30px rgb(30 95 74 / 0.08), 0 1px 2px rgb(30 95 74 / 0.06);
 
   /* Neutrals */
   --color-ink: #16332a; /* body text */

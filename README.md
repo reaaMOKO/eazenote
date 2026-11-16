@@ -73,7 +73,7 @@ src/
   app/            Page addresses (routes). Each page file is a few lines that show one screen.
   features/       One folder per part of the product:
     auth/           sign-in
-    home/           the home screen after sign-in
+    home/           "Today", the home screen after sign-in
     practice/       practice details and letterhead
     consult/        new consult, recording, transcript
     documents/      drafting, editing, approval, delivery
@@ -82,7 +82,8 @@ src/
     drafting/       AI drafting      (sample data now; Claude in Phase 3)
     delivery/       email and phone  (sends nothing now; real sending in Phase 4)
     index.ts        chooses which implementation the app uses
-  components/     Shared building blocks: buttons, text boxes, notices, logo, header
+  components/     Shared building blocks: buttons, cards, text boxes, notices, logo,
+                  and the layout (sidebar on laptops, top bar on phones)
   config/         Settings that are safe to be public (demo mode, limits)
   lib/            Small helpers (dates, browser storage)
   server/         Server-only code. API keys are read here and nowhere else.

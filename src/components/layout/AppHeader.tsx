@@ -6,12 +6,15 @@ import { EazeNoteLogo } from "@/components/brand/EazeNoteLogo";
 import { endDemoSession } from "@/features/auth/session-store";
 
 const NAVIGATION_LINKS = [
-  { href: "/consults", label: "Consults" },
+  { href: "/consults", label: "Today" },
   { href: "/practice", label: "Practice" },
 ];
 
-/** Top bar on every signed-in screen. Hidden when printing a document. */
-export function AppHeader({ pageWidthClass }: { pageWidthClass: string }) {
+/**
+ * Compact top bar for phones and small tablets. From the "lg" width up, the
+ * sidebar (AppSidebar) takes over and this bar is hidden. Never printed.
+ */
+export function AppHeader() {
   const currentPath = usePathname();
   const router = useRouter();
 
@@ -21,9 +24,9 @@ export function AppHeader({ pageWidthClass }: { pageWidthClass: string }) {
   }
 
   return (
-    <header className="border-b border-line bg-white print:hidden">
-      <div className={`mx-auto flex w-full ${pageWidthClass} flex-wrap items-center justify-between gap-x-4 gap-y-1 px-4 py-2 sm:px-6`}>
-        <Link href="/consults" aria-label="EazeNote: go to consults" className="rounded-lg py-1.5">
+    <header className="border-b border-line bg-white lg:hidden print:hidden">
+      <div className="flex w-full flex-wrap items-center justify-between gap-x-4 gap-y-1 px-4 py-2 sm:px-6">
+        <Link href="/consults" aria-label="EazeNote: go to Today" className="rounded-lg py-1.5">
           <EazeNoteLogo badgeSize={32} />
         </Link>
 
@@ -36,7 +39,7 @@ export function AppHeader({ pageWidthClass }: { pageWidthClass: string }) {
                 href={link.href}
                 aria-current={isCurrentSection ? "page" : undefined}
                 className={`flex min-h-11 items-center rounded-lg px-3 ${
-                  isCurrentSection ? "bg-tint text-deep" : "text-slate hover:text-deep"
+                  isCurrentSection ? "bg-deep text-white" : "text-slate hover:text-deep"
                 }`}
               >
                 {link.label}

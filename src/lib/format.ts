@@ -17,6 +17,11 @@ export function formatDate(isoTimestamp: string): string {
   return DATE_FORMAT.format(new Date(isoTimestamp));
 }
 
+/** "21:48" */
+export function formatTime(isoTimestamp: string): string {
+  return TIME_FORMAT.format(new Date(isoTimestamp));
+}
+
 /** "14 November 2026 at 21:48" */
 export function formatDateAndTime(isoTimestamp: string): string {
   const date = new Date(isoTimestamp);
