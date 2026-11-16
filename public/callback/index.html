@@ -1,0 +1,450 @@
+<!DOCTYPE html>
+<html lang="en-ZA">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>EazeNote call back</title>
+<meta name="description" content="EazeNote listens to the consult and drafts the clinical note, referral and script. You check and sign. Save your number and we will call you back.">
+<meta property="og:title" content="EazeNote: your last patient should end your day">
+<meta property="og:description" content="Voice becomes notes, referrals and scripts. Save your number and we will call you back.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@500;600;800&display=swap" rel="stylesheet">
+<style>
+/* EazeHealth brand tokens (from the logo and launch media sheet).
+   Layout idea: the promise beside the video, then a clinic evening told as a
+   clock-time rail, then the steps, the terms, and one deep-green form panel. */
+:root {
+  color-scheme: light;
+  --deep: #1E5F4A;
+  --green: #237A5B;
+  --slate: #57655F;
+  --mint: #BDE6D0;
+  --wash: #EEF6F1;
+  --ink: #15332A;
+  --paper: #FFFFFF;
+  --line: #D3E5DA;
+  --font: "Inter", "Helvetica Neue", Arial, sans-serif;
+  --wrap: 1120px;
+  --r: 14px;
+}
+*, *::before, *::after { box-sizing: border-box; }
+html { scroll-behavior: smooth; }
+body {
+  margin: 0;
+  background: var(--paper);
+  color: var(--ink);
+  font-family: var(--font);
+  font-weight: 500;
+  font-size: 17px;
+  line-height: 1.55;
+  -webkit-font-smoothing: antialiased;
+}
+img, video, svg { max-width: 100%; display: block; }
+h1, h2, h3 { font-weight: 800; line-height: 1.12; letter-spacing: -0.02em; margin: 0; text-wrap: balance; color: var(--deep); }
+p { margin: 0; }
+a { color: var(--green); }
+:focus-visible { outline: 3px solid var(--green); outline-offset: 3px; border-radius: 6px; }
+.wrap { width: 100%; max-width: var(--wrap); margin: 0 auto; padding: 0 20px; }
+.eyebrow { font-size: 0.78rem; font-weight: 800; letter-spacing: 0.09em; text-transform: uppercase; color: var(--green); }
+.lede { color: var(--slate); font-size: 1.12rem; max-width: 34em; }
+
+.btn {
+  display: inline-flex; align-items: center; justify-content: center; gap: 8px;
+  background: var(--deep); color: #fff; text-decoration: none;
+  font: inherit; font-weight: 800; font-size: 1.02rem;
+  padding: 15px 26px; border-radius: 999px; border: 0; cursor: pointer;
+  transition: background 0.15s ease, transform 0.15s ease;
+}
+.btn:hover { background: var(--green); }
+.btn:active { transform: translateY(1px); }
+.btn.small { padding: 10px 18px; font-size: 0.92rem; }
+.btn.light { background: #fff; color: var(--deep); }
+.btn.light:hover { background: var(--mint); }
+
+/* top bar */
+.top { border-bottom: 1px solid var(--line); background: var(--paper); }
+.top .wrap { display: flex; align-items: center; justify-content: space-between; gap: 16px; padding-top: 14px; padding-bottom: 14px; }
+.logo { display: inline-flex; align-items: center; gap: 10px; text-decoration: none; }
+.logo svg { width: 40px; height: 40px; flex: none; }
+.logo .word { font-weight: 800; font-size: 1.5rem; letter-spacing: -0.03em; color: var(--deep); line-height: 1; }
+.logo .word b { font-weight: 800; color: var(--green); }
+.logo small { display: block; font-size: 0.7rem; font-weight: 600; color: var(--slate); letter-spacing: 0; margin-top: 3px; }
+
+/* hero */
+.hero { background: linear-gradient(180deg, var(--wash) 0%, var(--paper) 100%); padding: 44px 0 56px; }
+.hero .wrap { display: grid; gap: 36px; align-items: center; }
+.hero h1 { font-size: clamp(2.05rem, 5vw, 3.35rem); margin: 14px 0 18px; }
+.hero h1 span { color: var(--green); display: block; }
+.hero .cta { display: flex; flex-wrap: wrap; align-items: center; gap: 14px 18px; margin-top: 26px; }
+.hero .cta small { color: var(--slate); font-size: 0.92rem; }
+.film { border-radius: var(--r); overflow: hidden; background: var(--wash); border: 1px solid var(--line); box-shadow: 0 24px 50px -28px rgba(30, 95, 74, 0.55); }
+.film video { width: 100%; aspect-ratio: 16 / 9; background: var(--wash); }
+.film figcaption { padding: 10px 14px; font-size: 0.85rem; color: var(--slate); background: var(--paper); border-top: 1px solid var(--line); }
+figure { margin: 0; }
+
+section { padding: 60px 0; }
+section > .wrap > h2 { font-size: clamp(1.6rem, 3.4vw, 2.3rem); max-width: 20em; margin-top: 10px; }
+section > .wrap > .lede { margin-top: 14px; }
+
+/* evening rail */
+.rail { list-style: none; margin: 34px 0 0; padding: 0; display: grid; gap: 0; }
+.rail li { position: relative; padding: 0 0 26px 30px; border-left: 2px solid var(--mint); margin-left: 7px; }
+.rail li::before { content: ""; position: absolute; left: -8px; top: 5px; width: 14px; height: 14px; border-radius: 50%; background: var(--paper); border: 3px solid var(--green); }
+.rail li:last-child { padding-bottom: 0; border-left-color: transparent; }
+.rail time { display: block; font-weight: 800; font-size: 1.35rem; color: var(--deep); font-variant-numeric: tabular-nums; letter-spacing: -0.02em; }
+.rail strong { display: block; font-weight: 800; margin-top: 2px; }
+.rail span { color: var(--slate); display: block; max-width: 30em; }
+.fact { margin-top: 34px; background: var(--wash); border-radius: var(--r); padding: 22px 24px; display: grid; gap: 6px; }
+.fact b { font-weight: 800; font-size: 1.25rem; color: var(--deep); letter-spacing: -0.01em; }
+.fact small { color: var(--slate); font-size: 0.88rem; }
+
+/* steps */
+.band { background: var(--wash); }
+.steps { list-style: none; counter-reset: s; margin: 34px 0 0; padding: 0; display: grid; gap: 14px; }
+.steps li { counter-increment: s; background: var(--paper); border: 1px solid var(--line); border-radius: var(--r); padding: 18px 18px 18px 62px; position: relative; }
+.steps li::before { content: counter(s); position: absolute; left: 18px; top: 18px; width: 30px; height: 30px; border-radius: 50%; background: var(--deep); color: #fff; font-weight: 800; font-size: 0.95rem; display: grid; place-items: center; }
+.steps b { display: block; font-weight: 800; color: var(--deep); }
+.steps span { color: var(--slate); font-size: 0.97rem; }
+
+/* outcomes */
+.gains { display: grid; gap: 26px; margin-top: 34px; }
+.gains div { border-top: 3px solid var(--green); padding-top: 16px; }
+.gains h3 { font-size: 1.25rem; }
+.gains p { color: var(--slate); margin-top: 8px; }
+
+/* terms */
+.terms { display: grid; gap: 28px; margin-top: 34px; align-items: start; }
+.checks { list-style: none; margin: 0; padding: 0; display: grid; gap: 16px; }
+.checks li { padding-left: 34px; position: relative; }
+.checks li::before { content: ""; position: absolute; left: 0; top: 3px; width: 22px; height: 22px; border-radius: 50%; background: var(--mint); }
+.checks li::after { content: ""; position: absolute; left: 7px; top: 8px; width: 8px; height: 5px; border-left: 2.5px solid var(--deep); border-bottom: 2.5px solid var(--deep); transform: rotate(-45deg); }
+.checks b { font-weight: 800; color: var(--deep); display: block; }
+.checks span { color: var(--slate); }
+.price { background: var(--deep); color: #fff; border-radius: var(--r); padding: 28px; }
+.price .amt { font-weight: 800; font-size: 3.2rem; line-height: 1; letter-spacing: -0.03em; font-variant-numeric: tabular-nums; }
+.price .per { font-weight: 600; color: var(--mint); margin-top: 6px; }
+.price ul { list-style: none; margin: 20px 0 0; padding: 20px 0 0; border-top: 1px solid rgba(189, 230, 208, 0.35); display: grid; gap: 8px; }
+.price li { color: #E4F3EB; }
+.price .offer { margin-top: 20px; background: rgba(189, 230, 208, 0.16); border-radius: 10px; padding: 14px 16px; font-weight: 600; }
+.price .offer b { font-weight: 800; color: var(--mint); display: block; font-size: 0.78rem; letter-spacing: 0.09em; text-transform: uppercase; margin-bottom: 2px; }
+
+/* call back panel */
+.call { background: var(--deep); color: #fff; padding: 60px 0; }
+.call .wrap { display: grid; gap: 34px; align-items: start; }
+.call h2 { color: #fff; font-size: clamp(1.8rem, 4vw, 2.7rem); }
+.call .eyebrow { color: var(--mint); }
+.call .lede { color: #DCEFE5; margin-top: 14px; }
+.next { list-style: none; counter-reset: n; margin: 28px 0 0; padding: 0; display: grid; gap: 14px; }
+.next li { counter-increment: n; padding-left: 42px; position: relative; color: #E4F3EB; }
+.next li::before { content: counter(n); position: absolute; left: 0; top: 0; width: 28px; height: 28px; border-radius: 50%; border: 2px solid var(--mint); color: var(--mint); font-weight: 800; font-size: 0.9rem; display: grid; place-items: center; }
+.already { margin-top: 14px; padding: 12px 14px; border-radius: 10px; background: rgba(189, 230, 208, 0.16); color: #E4F3EB; font-size: 0.95rem; }
+.founder { margin-top: 28px; padding-top: 20px; border-top: 1px solid rgba(189, 230, 208, 0.35); color: #DCEFE5; font-size: 0.97rem; }
+.founder b { color: #fff; font-weight: 800; display: block; }
+.formcard { background: var(--paper); color: var(--ink); border-radius: var(--r); padding: 24px; min-height: 420px; }
+.formcard iframe { width: 100%; border: 0; min-height: 560px; }
+.formcard h3 { font-size: 1.3rem; }
+.note { background: var(--wash); border: 1px dashed var(--green); border-radius: 10px; padding: 10px 12px; font-size: 0.85rem; color: var(--slate); margin-bottom: 18px; }
+.mock { display: grid; gap: 16px; margin-top: 16px; }
+.mock label, .mock legend { font-weight: 600; font-size: 0.95rem; display: block; margin-bottom: 6px; padding: 0; }
+.mock input[type="text"], .mock input[type="tel"] { width: 100%; font: inherit; padding: 12px 14px; border: 1.5px solid var(--line); border-radius: 10px; background: var(--paper); color: var(--ink); }
+.mock fieldset { border: 0; margin: 0; padding: 0; }
+.chips { display: flex; flex-wrap: wrap; gap: 8px; }
+.chips label { margin: 0; border: 1.5px solid var(--line); border-radius: 999px; padding: 8px 14px; font-size: 0.92rem; cursor: pointer; display: inline-flex; align-items: center; gap: 6px; }
+.chips input { accent-color: var(--deep); margin: 0; }
+.mock .consent { display: flex; gap: 10px; align-items: flex-start; font-size: 0.88rem; font-weight: 500; color: var(--slate); margin: 0; }
+.consent input { margin-top: 4px; accent-color: var(--deep); }
+.mock .more { font-size: 0.88rem; color: var(--slate); border-left: 3px solid var(--mint); padding-left: 12px; }
+.mock .btn { width: 100%; }
+.fallback { display: grid; gap: 14px; align-content: start; }
+.fallback p { color: var(--slate); }
+
+/* faq */
+.faq { display: grid; gap: 26px 40px; margin-top: 34px; }
+.faq h3 { font-size: 1.08rem; letter-spacing: -0.01em; }
+.faq p { color: var(--slate); margin-top: 6px; }
+
+footer { background: var(--wash); padding: 34px 0 96px; color: var(--slate); font-size: 0.88rem; }
+footer .wrap { display: grid; gap: 12px; }
+footer b { color: var(--deep); font-weight: 800; }
+
+/* phone-only sticky action */
+.sticky { position: fixed; left: 0; right: 0; bottom: 0; padding: 10px 16px calc(10px + env(safe-area-inset-bottom, 0px)); background: rgba(255, 255, 255, 0.96); border-top: 1px solid var(--line); z-index: 10; }
+.sticky .btn { width: 100%; }
+.sticky[hidden] { display: none; }
+
+@media (min-width: 700px) {
+  .steps { grid-template-columns: repeat(5, 1fr); }
+  .steps li { padding: 58px 16px 18px; }
+  .gains { grid-template-columns: repeat(3, 1fr); }
+  .faq { grid-template-columns: 1fr 1fr; }
+  .rail { grid-template-columns: repeat(3, 1fr); }
+  .rail li { border-left: 0; border-top: 2px solid var(--mint); margin-left: 0; padding: 22px 24px 0 0; }
+  .rail li::before { left: 0; top: -8px; }
+  .rail li:last-child { border-top-color: var(--mint); }
+}
+@media (min-width: 900px) {
+  body { font-size: 18px; }
+  .hero { padding: 64px 0 76px; }
+  .hero .wrap { grid-template-columns: 1fr 1.05fr; gap: 52px; }
+  section, .call { padding: 84px 0; }
+  .terms { grid-template-columns: 1.15fr 0.85fr; gap: 56px; }
+  .call .wrap { grid-template-columns: 0.9fr 1.1fr; gap: 60px; }
+  .sticky { display: none; }
+  footer { padding-bottom: 40px; }
+}
+@media (prefers-reduced-motion: reduce) {
+  html { scroll-behavior: auto; }
+  .btn { transition: none; }
+}
+</style>
+</head>
+<body>
+
+<header class="top">
+  <div class="wrap">
+    <a class="logo" href="#top" aria-label="EazeNote by EazeHealth">
+      <svg viewBox="0 0 48 48" aria-hidden="true">
+        <circle cx="24" cy="24" r="24" fill="#1E5F4A"/>
+        <path d="M15 13h18a3 3 0 0 1 3 3v13a3 3 0 0 1-3 3H21l-5 4.5V32h-1a3 3 0 0 1-3-3V16a3 3 0 0 1 3-3z" fill="#fff"/>
+        <g stroke="#1E5F4A" stroke-width="2" stroke-linecap="round">
+          <path d="M18 19.5v3M21 18v6M24 17v8M27 18v6M30 19.5v3"/>
+          <path d="M18 28h12"/>
+        </g>
+      </svg>
+      <span><span class="word">Eaze<b>Note</b></span><small>by EazeHealth</small></span>
+    </a>
+    <a class="btn small" href="#call-back">Request a call back</a>
+  </div>
+</header>
+
+<main id="top">
+
+<div class="hero">
+  <div class="wrap">
+    <div>
+      <p class="eyebrow">For independent GPs, psychologists and clinicians in South Africa</p>
+      <h1>Your last patient should end your day. <span>Not start your paperwork.</span></h1>
+      <p class="lede">EazeNote listens to the consult and drafts the clinical note, the referral letter and the script. You check it and sign.</p>
+      <div class="cta">
+        <a class="btn" href="#call-back">Request a call back</a>
+        <small>Takes 30 seconds. Name and number is all we need.</small>
+      </div>
+    </div>
+    <figure class="film">
+      <video id="film" controls playsinline preload="metadata" poster="/callback/poster.jpg">
+        <source src="/callback/eazenote.mp4" type="video/mp4">
+      </video>
+      <figcaption>46 seconds: one consult, written up while you talk.</figcaption>
+    </figure>
+  </div>
+</div>
+
+<section aria-labelledby="evening">
+  <div class="wrap">
+    <p class="eyebrow">A normal evening in private practice</p>
+    <h2 id="evening">7:40 pm. The waiting room is empty. The paperwork isn't.</h2>
+    <ol class="rail">
+      <li><time>6:30 pm</time><strong>Last patient leaves.</strong><span>Today's consults are still in your head, half of them in a mix of languages.</span></li>
+      <li><time>7:40 pm</time><strong>Still typing.</strong><span>Clinical notes, a referral letter, and ICD-10 codes so the medical aid claim isn't rejected.</span></li>
+      <li><time>9:15 pm</time><strong>Home, finally.</strong><span>Tired, behind, and wondering whether you missed something in a record.</span></li>
+    </ol>
+    <div class="fact">
+      <b>1 to 1.5 hours a day goes to admin. That is about 10 hours a week.</b>
+      <small>What independent clinicians told EazeHealth in our interviews. With no admin team and no scribe, every note, code and letter is yours to write.</small>
+    </div>
+  </div>
+</section>
+
+<section class="band" aria-labelledby="how">
+  <div class="wrap">
+    <p class="eyebrow">How it works</p>
+    <h2 id="how">You talk to your patient. EazeNote writes the note.</h2>
+    <ol class="steps">
+      <li><b>Consent</b><span>Your patient agrees on WhatsApp before anything is recorded.</span></li>
+      <li><b>Listen</b><span>Consult the way you always do, in the mix of languages your patient speaks.</span></li>
+      <li><b>Draft</b><span>A SOAP note, referral letter and script are drafted for you.</span></li>
+      <li><b>Code</b><span>ICD-10 codes are suggested for you to confirm.</span></li>
+      <li><b>Sign</b><span>You review, correct and sign. Nothing is saved until you approve it.</span></li>
+    </ol>
+  </div>
+</section>
+
+<section aria-labelledby="gains">
+  <div class="wrap">
+    <p class="eyebrow">What changes for you</p>
+    <h2 id="gains">The note is drafted before the next patient walks in.</h2>
+    <div class="gains">
+      <div><h3>Go home on time</h3><p>Finish each note between patients instead of saving them all for after hours.</p></div>
+      <div><h3>Be present</h3><p>Keep your eyes on the patient, not the keyboard, in whichever language they are most comfortable.</p></div>
+      <div><h3>Sign with confidence</h3><p>Structured, coded notes that you check and approve yourself.</p></div>
+    </div>
+  </div>
+</section>
+
+<section class="band" aria-labelledby="terms">
+  <div class="wrap">
+    <p class="eyebrow">You stay in charge</p>
+    <h2 id="terms">Your notes, your judgement, your signature.</h2>
+    <div class="terms">
+      <ul class="checks">
+        <li><b>You sign every note</b><span>EazeNote drafts. You review, edit and approve before anything is saved.</span></li>
+        <li><b>It never diagnoses</b><span>It writes up what happened in the consult. Clinical decisions stay with you.</span></li>
+        <li><b>Patient consent comes first</b><span>Your patient agrees before the consult is recorded.</span></li>
+        <li><b>Built around how you are regulated</b><span>Designed with HPCSA record-keeping, POPIA and ICD-10 coding for medical aid in mind.</span></li>
+        <li><b>No new system to learn</b><span>Copy or export the signed note into the records you already keep.</span></li>
+      </ul>
+      <div class="price">
+        <div class="amt">R3</div>
+        <div class="per">per signed note</div>
+        <ul>
+          <li>No subscription and no lock-in.</li>
+          <li>Buy credits and use them only on the days you consult.</li>
+          <li>About R30 on a ten-patient day.</li>
+        </ul>
+        <div class="offer"><b>Founding Clinician offer</b>The first 20 practices start free.</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<div class="call" id="call-back">
+  <div class="wrap">
+    <div>
+      <p class="eyebrow">Request a call back</p>
+      <h2>Save your number. We'll call you back.</h2>
+      <p class="lede">Sign up for a call back today and start trying EazeNote in your own practice.</p>
+      <p class="already">Already left your number on Facebook or Instagram? You are on our list. Adding your practice details here helps us make the call useful.</p>
+      <ol class="next">
+        <li>Leave your name and number. A few details about your practice are optional.</li>
+        <li>We call you back for a short conversation about how your practice runs.</li>
+        <li>We get you set up to try EazeNote with your next patients.</li>
+      </ol>
+      <p class="founder"><b>Reamohetse Mokoatle</b>Founder, EazeHealth. I make these calls myself.</p>
+    </div>
+    <div class="formcard" id="form-slot">
+      <div id="form-preview">
+        <p class="note">Form preview. Your live Tally form replaces this card once it is published.</p>
+        <h3>Where should we call you?</h3>
+        <div class="mock">
+          <div><label for="f-name">Full name</label><input id="f-name" type="text" placeholder="Dr Thandi Nkosi" autocomplete="name"></div>
+          <div><label for="f-mobile">Mobile number</label><input id="f-mobile" type="tel" placeholder="082 123 4567" autocomplete="tel"></div>
+          <fieldset><legend>I am a</legend>
+            <div class="chips">
+              <label><input type="radio" name="role" id="f-role-gp"> GP</label>
+              <label><input type="radio" name="role" id="f-role-psy"> Psychologist</label>
+              <label><input type="radio" name="role" id="f-role-other"> Other clinician</label>
+              <label><input type="radio" name="role" id="f-role-pm"> Practice manager</label>
+            </div>
+          </fieldset>
+          <fieldset><legend>Best time to call</legend>
+            <div class="chips">
+              <label><input type="radio" name="time" id="f-time-am"> Before 9 am</label>
+              <label><input type="radio" name="time" id="f-time-lunch"> Lunch, 12 to 2</label>
+              <label><input type="radio" name="time" id="f-time-pm"> After 5 pm</label>
+              <label><input type="radio" name="time" id="f-time-sat"> Saturday morning</label>
+            </div>
+          </fieldset>
+          <p class="more">Optional in the live form: practice name, town, patients a day, how you write notes today, and what takes most of your time after hours.</p>
+          <label class="consent" for="f-consent"><input type="checkbox" id="f-consent"><span>I agree that EazeHealth may call or WhatsApp me about EazeNote. Please do not include patient information.</span></label>
+          <button class="btn" type="button" id="f-submit">Call me back</button>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<section aria-labelledby="faq">
+  <div class="wrap">
+    <p class="eyebrow">Before you sign up</p>
+    <h2 id="faq">Questions doctors ask us</h2>
+    <div class="faq">
+      <div><h3>What happens on the call?</h3><p>A short conversation with the founder about how your practice runs, then we get you set up to try EazeNote. There is nothing to pay on the call.</p></div>
+      <div><h3>Who is EazeNote for?</h3><p>Independent GPs, psychologists in private practice and other independent clinicians who write their own notes, letters and codes.</p></div>
+      <div><h3>Does it make clinical decisions?</h3><p>No. EazeNote writes up the consult for you to check. It does not diagnose, and nothing is saved until you sign.</p></div>
+      <div><h3>My patients switch languages. Does that work?</h3><p>EazeNote is built for the way South Africans actually speak, including consults that move between languages.</p></div>
+      <div><h3>What does it cost?</h3><p>R3 per signed note, bought as prepaid credits. There is no monthly subscription and no lock-in. The first 20 practices start free.</p></div>
+      <div><h3>Do I need to change my practice software?</h3><p>No. You copy or export the signed note into the system you already use.</p></div>
+    </div>
+  </div>
+</section>
+
+</main>
+
+<footer>
+  <div class="wrap">
+    <p><b>EazeNote</b> by EazeHealth · Registered company 2026/840573/07 · South Africa · <a href="https://eazehealth.co.za">eazehealth.co.za</a> · hello@eazehealth.co.za</p>
+    <p>EazeNote drafts notes for a registered clinician to review and sign. It does not diagnose and does not replace clinical judgement. Names and consult details shown in the video are fictional.</p>
+    <p>We use your details only to call you back about EazeNote. <a href="https://eazehealth.co.za/#privacy">Privacy notice</a></p>
+  </div>
+</footer>
+
+<div class="sticky" id="sticky"><a class="btn" href="#call-back">Request a call back</a></div>
+
+<script>
+/* ---- Settings ------------------------------------------------------------ */
+var TALLY_FORM_ID = "bZexAZ";  // https://tally.so/r/bZexAZ
+var TALLY_LIVE = true;         // the Tally form is published
+var META_PIXEL_ID = "";        // your Meta Pixel (dataset) ID, digits only
+/* -------------------------------------------------------------------------- */
+
+(function () {
+  // Hide the phone action bar while the form is on screen.
+  var sticky = document.getElementById("sticky");
+  var panel = document.getElementById("call-back");
+  if ("IntersectionObserver" in window) {
+    new IntersectionObserver(function (entries) {
+      sticky.hidden = entries[0].isIntersecting;
+    }, { threshold: 0.15 }).observe(panel);
+  }
+
+  // Meta Pixel: PageView on load, Lead when the Tally form is submitted.
+  if (META_PIXEL_ID) {
+    !function (f, b, e, v, n, t, s) {
+      if (f.fbq) return; n = f.fbq = function () { n.callMethod ? n.callMethod.apply(n, arguments) : n.queue.push(arguments); };
+      if (!f._fbq) f._fbq = n; n.push = n; n.loaded = !0; n.version = "2.0"; n.queue = [];
+      t = b.createElement(e); t.async = !0; t.src = v; s = b.getElementsByTagName(e)[0]; s.parentNode.insertBefore(t, s);
+    }(window, document, "script", "https://connect.facebook.net/en_US/fbevents.js");
+    fbq("init", META_PIXEL_ID);
+    fbq("track", "PageView");
+  }
+
+  // Tally: swap the preview for the live form and pass the ad's UTM tags through.
+  if (TALLY_FORM_ID && TALLY_LIVE) {
+    var slot = document.getElementById("form-slot");
+    var qs = window.location.search ? window.location.search.slice(1) : "";
+    var formUrl = "https://tally.so/r/" + TALLY_FORM_ID + (qs ? "?" + qs : "");
+
+    // Where a host page blocks embedded forms, offer the form as a link instead.
+    var showLink = function () {
+      slot.innerHTML = '<div class="fallback"><h3>Where should we call you?</h3>' +
+        '<p>Name and number is all we need. The form opens in a new tab.</p>' +
+        '<a class="btn" id="open-form" href="' + formUrl + '" target="_blank" rel="noopener">Request a call back</a></div>';
+    };
+    var blocked = false;
+    document.addEventListener("securitypolicyviolation", function (e) {
+      if (!blocked && String(e.blockedURI).indexOf("tally.so") !== -1) { blocked = true; showLink(); }
+    });
+
+    var frame = document.createElement("iframe");
+    frame.title = "Request a call back about EazeNote";
+    frame.setAttribute("data-tally-src", "https://tally.so/embed/" + TALLY_FORM_ID + "?alignLeft=1&hideTitle=1&transparentBackground=1&dynamicHeight=1" + (qs ? "&" + qs : ""));
+    slot.innerHTML = "";
+    slot.appendChild(frame);
+    var s = document.createElement("script");
+    s.src = "https://tally.so/widgets/embed.js";
+    s.onload = function () { if (window.Tally) window.Tally.loadEmbeds(); };
+    s.onerror = function () { if (!blocked) frame.src = frame.getAttribute("data-tally-src"); };
+    document.body.appendChild(s);
+
+    var sent = false;
+    window.addEventListener("message", function (e) {
+      if (sent || typeof e.data !== "string" || e.data.indexOf("Tally.FormSubmitted") === -1) return;
+      sent = true;
+      if (window.fbq) fbq("track", "Lead");
+    });
+  }
+})();
+</script>
+</body>
+</html>

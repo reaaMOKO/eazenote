@@ -36,6 +36,12 @@ const nextConfig: NextConfig = {
   async headers() {
     return [{ source: "/(.*)", headers: SECURITY_HEADERS }];
   },
+
+  // The call-back campaign page is a plain HTML file in public/callback, so the
+  // ad link can be the short /callback address instead of /callback/index.html.
+  async rewrites() {
+    return [{ source: "/callback", destination: "/callback/index.html" }];
+  },
 };
 
 export default nextConfig;
